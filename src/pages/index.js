@@ -7,7 +7,7 @@ import Seo from "../components/seo"
 
 const BlogIndex = ({ data, location }) => {
   const siteTitle = data.site.siteMetadata?.title || `Title`
-  const posts = data.allMarkdownRemark.nodes
+  const posts = data.allFile.nodes.map(post => post.childMarkdownRemark)
 
   if (posts.length === 0) {
     return (
@@ -72,16 +72,20 @@ export const pageQuery = graphql`
         title
       }
     }
-    allMarkdownRemark(sort: { fields: [frontmatter___date], order: DESC }) {
+    allFile(
+      filter: { sourceInstanceName: { eq: "blog" }, extension: { eq: "md" } }
+    ) {
       nodes {
-        excerpt
-        fields {
-          slug
-        }
-        frontmatter {
-          date(formatString: "MMMM DD, YYYY")
-          title
-          description
+        childMarkdownRemark {
+          excerpt
+          fields {
+            slug
+          }
+          frontmatter {
+            title
+            date(formatString: "MMMM D YYYY")
+            description
+          }
         }
       }
     }
